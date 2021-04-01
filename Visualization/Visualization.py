@@ -9,13 +9,13 @@ import imageio
 
 # %%
 # Create a map in the center of Montpellier. 
-map = folium.Map(location=[43.616482, 3.874153], zoom_start=12)
+map = folium.Map(location = [43.616482, 3.874153], zoom_start = 12)
 #%%
 # Before we start, i created some functions. 
 # It's the same function used in the prediction part.
 def rows(df):
     for i in range(len(df)):
-        df.rename(index = {df.index[i]:i}, inplace=True)
+        df.rename(index = {df.index[i]:i}, inplace = True)
     return(df)
 
 # %%
@@ -25,7 +25,7 @@ def drop(df):
         df = df
     else:
         df.drop(df.index[0:20], inplace = True)
-    df.drop(columns = ['laneId','type','reversedLane'], inplace = True)
+    df.drop(columns = ['laneId', 'type', 'reversedLane'], inplace = True)
     rows(df)
 
 #%%
@@ -77,7 +77,7 @@ for i in range(1,9):
 # Create all the maps since 06/01/2021 and save them in HTML format.
 Mtp_map = {}
 for i in range(0,84):
-    Mtp_map[i] = folium.Map(location=[43.616482, 3.874153], zoom_start=12, tiles='CartoDB dark_matter')
+    Mtp_map[i] = folium.Map(location = [43.616482, 3.874153], zoom_start = 12, tiles = 'CartoDB dark_matter')
     for j in range(1,9):
         folium.CircleMarker(radius = bike[j]['intensity'][i]/100, location = point[j-1], color = 'gold', fill = True).add_to(Mtp_map[i])
     Mtp_map[i].save(f'Day{i+1}.html')
@@ -91,22 +91,3 @@ for file_name in sorted(os.listdir(png_dir)):
         file_path = os.path.join(png_dir, file_name)
         images.append(imageio.imread(file_path))
 imageio.mimsave('C:/Users/sobol/HMMA238/Projects/Velo/Gif/challenge.gif', images, fps = 2)
-# %%
-#%%
-# import os
-# import imageio
-
-# path = 'C:/Users/sobol/HMMA238/Projects/Velo/Html file'
-
-# image_folder = os.fsencode(path)
-
-# filenames = []
-
-# for file in os.listdir(image_folder):
-#     filename = os.fsdecode(file)
-#     if filename.endswith( ('.html') ):
-#         filenames.append(filename)
-# images = list(map(lambda filename: imageio.imread(filename), filenames))
-
-# imageio.mimsave(os.path.join(path, '../Vizualisation/gif'), images, duration = 0.04)
-# # %%

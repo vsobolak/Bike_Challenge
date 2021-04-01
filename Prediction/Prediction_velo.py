@@ -8,8 +8,7 @@ from download import download
 
 # Package for the linear regression
 from sklearn.linear_model import LinearRegression
-import statsmodels.api as sm
-import statsmodels.formula.api as smf
+import seaborn as sns
 
 #%%
 # Download the data
@@ -69,7 +68,7 @@ bike
 
 # Create the day for every unique date
 df = bike.copy()
-df = df.drop_duplicates(subset=['Date'])
+df = df.drop_duplicates(subset = ['Date'])
 rows(df)
 ligne = np.arange(0,len(df))
 df2 = pd.DataFrame(0, index = ligne, columns = ["Day"])
@@ -102,12 +101,10 @@ bicycle_jour['Day'] = bicycle_jour['Day'].replace([5], 'Saturday')
 bicycle_jour['Day'] = bicycle_jour['Day'].replace([6], 'Sunday')
 
 # %%
-# We only keep the hour between 08:20 and 09:30
+# We only keep the hour between 08:30 and 09:30
 bike2 = bicycle_jour.copy()
 bike2 = bike2[(bike2["Hour"] <= "09:30") & (bike2["Hour"] >= "08:30")] 
 
-
-# Si on a un jour en double, on garde seulement la derniere ligne dont la date est la meme
 # If we have a day in double, we only keep the last row with the same date 
 bike3 = bike2.copy()
 bike3 = bike3.drop_duplicates(subset=['Date'], keep='last')
@@ -121,8 +118,6 @@ bike_part1 = bike_part1[(bike_part1['Date'] >= "2020-10-01") & (bike_part1['Date
 bike_part2 = bike_part2[bike_part2['Date'] >= "2020-12-15"]
 bike4 = pd.concat([bike_part1, bike_part2])
 rows(bike4)
-# bike4 = bike4[bike4['Date'] >= "2020-10-01"]
-# rows(bike4)
 
 # We drop now the week-end and we use the function bike_total
 bike4 = drop_week(bike4)
@@ -158,20 +153,8 @@ print(f'\nMedian = {bike_med_fri}')
 
 # Linear regression 
 
-model = LinearRegression()
-#  Creation of our X and y :
-X = np.arange(0, len(bike4)).reshape((-1,1))
-y = bike4['Total bike']
-
-result = model.fit(X,y)
-print(result.intercept_, result.coef_)
-
-# Prediction : number of bikes estimated for tomorow :
-bike_est = result.intercept_ + result.coef_*len(bike4) - bike4['Total bike'][len(bike4)-1]
-print(f'Number of bikes estimated : {bike_est}')
-
 #%%
-# Friday only
+# Friday only :
 model2 = LinearRegression()
 
 # Creation of our X and y :
@@ -185,52 +168,13 @@ print(result2.intercept_, result2.coef_)
 bike_est_fri = result2.intercept_ + result2.coef_*len(Friday) - Friday['Total bike'][len(Friday)-1]
 print(f'Number of bikes estimated : {bike_est_fri}')
 
-
-
-
-
-#%%
-
-X3 = np.arange(0, 23)
-X3 = np.vander(X3, 2)
-
-model3 = sm.OLS(y,X3)
-result3 = model3.fit()
-
-print(result3.summary())
-
-#%%
-
-model = LinearRegression()
-#  Creation of our X and y :
-X = np.arange(0, len(bike4)).reshape((-1,1))
-y = bike4['Day bike']
-
-result = model.fit(X,y)
-print(result.intercept_, result.coef_)
-
-# Prediction : number of bikes estimated for tomorow :
-bike_est = result.intercept_ + result.coef_*len(bike4)
-print(f'Number of bikes estimated : {bike_est}')
-
-
-#%%
-# Regression avec tous les jours de la semaine
-results = smf.ols('Vélos_jour ~ Vélos_total', data = bicycle4).fit()
-print(results.summary())
-pred = results.predict(exog = dict)
-
-
-# Regression avec seulement les Vendredi
-results = smf.ols('Vélos_jour ~ Vélos_total', data = Friday).fit()
-print(results.summary())
-
 # %%
-# Histogramme 
-plt.hist(bicycle4["Vélos_jour"])
-plt.show()
+Bike_s = Friday.copy()
+Bike_s['Index'] = np.arange(1,len(Bike_s)+1)
+sns.lmplot(x = "Index", y = "Total bike", data = Bike_s)
 
-# Peut etre interessant
-bicycle4.plot('Vélos_total', 'Jour')
+#%%
+# Evolution of the number of bikes 
+index = np.arange(1,23)
+plt.plot(index, bike4['Day bike'])
 plt.show()
-
